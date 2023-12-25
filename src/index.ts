@@ -1,12 +1,12 @@
 import {
     ClientConfig,
-    Client,
     middleware,
     MiddlewareConfig,
     WebhookEvent,
     TextMessage,
     MessageAPIResponseBase,
   } from '@line/bot-sdk';
+import { MessagingApiClient } from '@line/bot-sdk/dist/messaging-api/api';
   import express, { Application, Request, Response } from 'express';
   import { load } from 'ts-dotenv';
   const env = load({
@@ -23,7 +23,7 @@ import {
   };
   const clientConfig: ClientConfig = config;
   const middlewareConfig: MiddlewareConfig = config;
-  const client = new Client(clientConfig); //①
+  const client = new MessagingApiClient(clientConfig); //①
   
   const app: Application = express(); //②
   
@@ -46,7 +46,7 @@ import {
       type: 'text',
       text: text,
     };
-    await client.replyMessage(replyToken, response);
+    await client.replyMessage({replyToken: replyToken, messages: [response]});
   };
   
   app.post( //⑤
