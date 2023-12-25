@@ -23,34 +23,37 @@ const env = (0, ts_dotenv_1.load)({
 });
 const PORT = env.PORT || 3000;
 const config = {
-    channelAccessToken: env.CHANNEL_ACCESS_TOKEN || '',
-    channelSecret: env.CHANNEL_SECRET || '',
+    channelAccessToken: env.CHANNEL_ACCESS_TOKEN || "",
+    channelSecret: env.CHANNEL_SECRET || "",
 };
 const clientConfig = config;
 const middlewareConfig = config;
 const client = new api_1.MessagingApiClient(clientConfig); //①
 const app = (0, express_1.default)(); //②
-app.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //③
     return res.status(200).send({
-        message: 'success',
+        message: "success",
     });
 }));
-const textEventHandler = (//④
+const textEventHandler = (
+//④
 event) => __awaiter(void 0, void 0, void 0, function* () {
-    if (event.type !== 'message' || event.message.type !== 'text') {
+    if (event.type !== "message" || event.message.type !== "text") {
         return;
     }
     const { replyToken } = event;
     const { text } = event.message;
     console.log(text);
     const response = {
-        type: 'text',
+        type: "text",
         text: text,
     };
     yield client.replyMessage({ replyToken: replyToken, messages: [response] });
 });
-app.post(//⑤
-'/webhook', (0, bot_sdk_1.middleware)(middlewareConfig), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post(
+//⑤
+"/webhook", (0, bot_sdk_1.middleware)(middlewareConfig), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const events = req.body.events;
     yield Promise.all(events.map((event) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -66,5 +69,6 @@ app.post(//⑤
     return res.status(200);
 }));
 app.listen(PORT, () => {
+    //⑥
     console.log(`http://localhost:${PORT}/`);
 });
