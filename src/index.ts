@@ -29,7 +29,7 @@ const client = new MessagingApiClient(clientConfig); //①
 
 const app: Application = express(); //②
 
-app.use(cors());
+// app.use(cors());
 
 app.get("/", async (_: Request, res: Response): Promise<Response> => {
   //③
