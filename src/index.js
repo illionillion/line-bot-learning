@@ -16,6 +16,7 @@ const bot_sdk_1 = require("@line/bot-sdk");
 const api_1 = require("@line/bot-sdk/dist/messaging-api/api");
 const express_1 = __importDefault(require("express"));
 const ts_dotenv_1 = require("ts-dotenv");
+const cors_1 = __importDefault(require("cors"));
 const env = (0, ts_dotenv_1.load)({
     CHANNEL_ACCESS_TOKEN: String,
     CHANNEL_SECRET: String,
@@ -30,6 +31,7 @@ const clientConfig = config;
 const middlewareConfig = config;
 const client = new api_1.MessagingApiClient(clientConfig); //①
 const app = (0, express_1.default)(); //②
+app.use((0, cors_1.default)());
 app.get("/", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     //③
     return res.status(200).send({
@@ -44,10 +46,11 @@ event) => __awaiter(void 0, void 0, void 0, function* () {
     }
     const { replyToken } = event;
     const { text } = event.message;
-    console.log(text);
+    const resText = text.split('').reverse().join('');
+    console.log(resText);
     const response = {
         type: "text",
-        text: text,
+        text: resText,
     };
     yield client.replyMessage({ replyToken: replyToken, messages: [response] });
 });

@@ -9,6 +9,8 @@ import {
 import { MessagingApiClient } from "@line/bot-sdk/dist/messaging-api/api";
 import express, { Application, Request, Response } from "express";
 import { load } from "ts-dotenv";
+import cors from 'cors';
+
 const env = load({
   CHANNEL_ACCESS_TOKEN: String,
   CHANNEL_SECRET: String,
@@ -27,6 +29,8 @@ const client = new MessagingApiClient(clientConfig); //①
 
 const app: Application = express(); //②
 
+app.use(cors());
+
 app.get("/", async (_: Request, res: Response): Promise<Response> => {
   //③
   return res.status(200).send({
@@ -44,11 +48,12 @@ const textEventHandler = async (
 
   const { replyToken } = event;
   const { text } = event.message;
-  console.log(text);
+  const resText = text.split('').reverse().join('')
+  console.log(resText);
 
   const response: TextMessage = {
     type: "text",
-    text: text,
+    text: resText,
   };
   await client.replyMessage({ replyToken: replyToken, messages: [response] });
 };
