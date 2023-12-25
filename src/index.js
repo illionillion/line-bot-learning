@@ -42,6 +42,7 @@ event) => __awaiter(void 0, void 0, void 0, function* () {
     }
     const { replyToken } = event;
     const { text } = event.message;
+    console.log(text);
     const response = {
         type: 'text',
         text: text,

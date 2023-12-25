@@ -42,6 +42,8 @@ import { MessagingApiClient } from '@line/bot-sdk/dist/messaging-api/api';
   
     const { replyToken } = event;
     const { text } = event.message;
+    console.log(text);
+    
     const response: TextMessage = {
       type: 'text',
       text: text,
