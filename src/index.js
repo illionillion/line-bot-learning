@@ -16,7 +16,7 @@ const bot_sdk_1 = require("@line/bot-sdk");
 const api_1 = require("@line/bot-sdk/dist/messaging-api/api");
 const express_1 = __importDefault(require("express"));
 const ts_dotenv_1 = require("ts-dotenv");
-const cors_1 = __importDefault(require("cors"));
+const fs_1 = require("fs");
 const env = (0, ts_dotenv_1.load)({
     CHANNEL_ACCESS_TOKEN: String,
     CHANNEL_SECRET: String,
@@ -27,36 +27,57 @@ const config = {
     channelAccessToken: env.CHANNEL_ACCESS_TOKEN || "",
     channelSecret: env.CHANNEL_SECRET || "",
 };
-const clientConfig = config;
 const middlewareConfig = config;
-const client = new api_1.MessagingApiClient(clientConfig); //①
-const app = (0, express_1.default)(); //②
-app.use((0, cors_1.default)());
+const client = new api_1.MessagingApiClient({
+    channelAccessToken: env.CHANNEL_ACCESS_TOKEN || "",
+});
+const clientB = new api_1.MessagingApiBlobClient({
+    channelAccessToken: env.CHANNEL_ACCESS_TOKEN || "",
+});
+const app = (0, express_1.default)();
 app.get("/", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
-    //③
     return res.status(200).send({
         message: "success",
     });
 }));
-const textEventHandler = (
-//④
-event) => __awaiter(void 0, void 0, void 0, function* () {
-    if (event.type !== "message" || event.message.type !== "text") {
+const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* () {
+    if (event.type !== "message") {
         return;
     }
     const { replyToken } = event;
-    const { text } = event.message;
-    const resText = text.split('').reverse().join('');
-    console.log(resText);
-    const response = {
-        type: "text",
-        text: resText,
-    };
-    yield client.replyMessage({ replyToken: replyToken, messages: [response] });
+    switch (event.message.type) {
+        case "text": {
+            const { text } = event.message;
+            const resText = text.split("").reverse().join("");
+            console.log(resText);
+            const response = {
+                type: "text",
+                text: resText,
+            };
+            yield client.replyMessage({
+                replyToken: replyToken,
+                messages: [response],
+            });
+            break;
+        }
+        case "image": {
+            const { id } = event.message;
+            yield downloadContent(id, id + ".jpeg");
+            const response = {
+                type: "text",
+                text: "画像を受け取りました。",
+            };
+            yield client.replyMessage({
+                replyToken: replyToken,
+                messages: [response],
+            });
+            break;
+        }
+        default:
+            break;
+    }
 });
-app.post(
-//⑤
-"/webhook", (0, bot_sdk_1.middleware)(middlewareConfig), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/webhook", (0, bot_sdk_1.middleware)(middlewareConfig), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const events = req.body.events;
     yield Promise.all(events.map((event) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -72,6 +93,14 @@ app.post(
     return res.status(200);
 }));
 app.listen(PORT, () => {
-    //⑥
     console.log(`http://localhost:${PORT}/`);
+});
+const downloadContent = (messageId, downloadPath) => __awaiter(void 0, void 0, void 0, function* () {
+    const stream = yield clientB.getMessageContent(messageId);
+    return yield new Promise((resolve, reject) => {
+        const writable = (0, fs_1.createWriteStream)(downloadPath);
+        stream.pipe(writable);
+        stream.on("end", () => resolve(downloadPath));
+        stream.on("error", reject);
+    });
 });
