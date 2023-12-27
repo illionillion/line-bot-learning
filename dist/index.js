@@ -16,7 +16,7 @@ const bot_sdk_1 = require("@line/bot-sdk");
 const api_1 = require("@line/bot-sdk/dist/messaging-api/api");
 const express_1 = __importDefault(require("express"));
 const ts_dotenv_1 = require("ts-dotenv");
-const fs_1 = require("fs");
+const downloadContent_1 = require("./lib/downloadContent");
 const env = (0, ts_dotenv_1.load)({
     CHANNEL_ACCESS_TOKEN: String,
     CHANNEL_SECRET: String,
@@ -62,7 +62,7 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
         }
         case "image": {
             const { id } = event.message;
-            yield downloadContent(id, id + ".jpeg");
+            yield (0, downloadContent_1.downloadContent)(id, id + ".jpeg", clientB);
             const response = {
                 type: "text",
                 text: "画像を受け取りました。",
@@ -94,13 +94,4 @@ app.post("/webhook", (0, bot_sdk_1.middleware)(middlewareConfig), (req, res) => 
 }));
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}/`);
-});
-const downloadContent = (messageId, downloadPath) => __awaiter(void 0, void 0, void 0, function* () {
-    const stream = yield clientB.getMessageContent(messageId);
-    return yield new Promise((resolve, reject) => {
-        const writable = (0, fs_1.createWriteStream)(downloadPath);
-        stream.pipe(writable);
-        stream.on("end", () => resolve(downloadPath));
-        stream.on("error", reject);
-    });
 });

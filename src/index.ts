@@ -11,7 +11,7 @@ import {
 } from "@line/bot-sdk/dist/messaging-api/api";
 import express, { Application, Request, Response } from "express";
 import { load } from "ts-dotenv";
-import { createWriteStream } from "fs";
+import { downloadContent } from "./lib/downloadContent";
 
 const env = load({
   CHANNEL_ACCESS_TOKEN: String,
@@ -69,7 +69,7 @@ const textEventHandler = async (
     case "image": {
       const { id } = event.message;
 
-      await downloadContent(id, id + ".jpeg");
+      await downloadContent(id, id + ".jpeg", clientB);
       const response: TextMessage = {
         type: "text",
         text: "画像を受け取りました。",
@@ -108,13 +108,3 @@ app.post(
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}/`);
 });
-
-const downloadContent = async (messageId: string, downloadPath: string) => {
-  const stream = await clientB.getMessageContent(messageId);
-  return await new Promise((resolve, reject) => {
-    const writable = createWriteStream(downloadPath);
-    stream.pipe(writable);
-    stream.on("end", () => resolve(downloadPath));
-    stream.on("error", reject);
-  });
-};
