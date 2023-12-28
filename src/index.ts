@@ -54,7 +54,16 @@ const textEventHandler = async (
     case "text": {
       const { text } = event.message;
 
-      const resText = text.split("").reverse().join("");
+      const resText = (() => {
+        switch (Math.floor(Math.random() * 3)) {
+          case 0:
+            return text.split("").reverse().join("")
+          case 1:
+            return text.split("").join(" ")
+          default:
+            return text.split("").reverse().join(" ")
+        }
+      })();
       console.log(resText);
 
       const response: TextMessage = {
