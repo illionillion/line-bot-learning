@@ -48,7 +48,7 @@ const textEventHandler = async (
     return;
   }
 
-  const { replyToken } = event;
+  const { replyToken, source } = event;
 
   switch (event.message.type) {
     case "text": {
@@ -69,7 +69,7 @@ const textEventHandler = async (
     case "image": {
       const { id } = event.message;
 
-      await downloadContent(id, id + ".jpeg", clientB);
+      await downloadContent(id, source.userId + "-" + id + ".jpeg", clientB);
       const response: TextMessage = {
         type: "text",
         text: "画像を受け取りました。",

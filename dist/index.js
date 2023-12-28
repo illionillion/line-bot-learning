@@ -44,7 +44,7 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
     if (event.type !== "message") {
         return;
     }
-    const { replyToken } = event;
+    const { replyToken, source } = event;
     switch (event.message.type) {
         case "text": {
             const { text } = event.message;
@@ -62,7 +62,7 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
         }
         case "image": {
             const { id } = event.message;
-            yield (0, downloadContent_1.downloadContent)(id, id + ".jpeg", clientB);
+            yield (0, downloadContent_1.downloadContent)(id, source.userId + "-" + id + ".jpeg", clientB);
             const response = {
                 type: "text",
                 text: "画像を受け取りました。",
