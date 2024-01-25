@@ -55,18 +55,18 @@ const textEventHandler = async (
     case "text": {
       const { text } = event.message;
 
-      if (text.toLowerCase().indexOf("illionillion") > 0) {
-        const response: ImageMessage = {
-          type: "image",
-          originalContentUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true",
-          previewImageUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true"
-        };
-        await client.replyMessage({
-          replyToken: replyToken,
-          messages: [response],
-        });
-        return
-      }
+      // if (text.toLowerCase().indexOf("illionillion") > 0) {
+      //   const response: ImageMessage = {
+      //     type: "image",
+      //     originalContentUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true",
+      //     previewImageUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true"
+      //   };
+      //   await client.replyMessage({
+      //     replyToken: replyToken,
+      //     messages: [response],
+      //   });
+      //   return
+      // }
       
       const resText = (() => {
         switch (Math.floor(Math.random() * 3)) {
