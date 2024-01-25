@@ -48,6 +48,18 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
     switch (event.message.type) {
         case "text": {
             const { text } = event.message;
+            if (text.toLowerCase().indexOf("illionillion") > 0) {
+                const response = {
+                    type: "image",
+                    originalContentUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true",
+                    previewImageUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true"
+                };
+                yield client.replyMessage({
+                    replyToken: replyToken,
+                    messages: [response],
+                });
+                return;
+            }
             const resText = (() => {
                 switch (Math.floor(Math.random() * 3)) {
                     case 0:
@@ -58,7 +70,6 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
                         return text.split("").reverse().join(" ");
                 }
             })();
-            console.log(resText);
             const response = {
                 type: "text",
                 text: resText,
