@@ -4,11 +4,11 @@ import {
   WebhookEvent,
   TextMessage,
   MessageAPIResponseBase,
-  ImageMessage,
 } from "@line/bot-sdk";
 import {
   MessagingApiClient,
   MessagingApiBlobClient,
+  ImageMessage,
 } from "@line/bot-sdk/dist/messaging-api/api";
 import express, { Application, Request, Response } from "express";
 import { load } from "ts-dotenv";
