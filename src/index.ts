@@ -13,7 +13,7 @@ import {
 import express, { Application, Request, Response } from "express";
 import { load } from "ts-dotenv";
 import { downloadContent } from "./lib/downloadContent";
-import fetch from "node-fetch";
+import axios from "axios";
 
 const env = load({
   CHANNEL_ACCESS_TOKEN: String,
@@ -58,18 +58,19 @@ const textEventHandler = async (
 
       // 「github」があるか確認
       if (text.toLowerCase().indexOf("github:") > -1) {
-        const username = text.split(':').pop()
-        const github = await fetch(`https://api.github.com/users/${username}`);
-        const json: any = await github.json();
-        if (!Object.keys(json).includes("avatar_url")) {
-          return
+        const username = text.split(":").pop();
+        const github = await axios({
+          url: `https://api.github.com/users/${username?.trim()}`,
+          method: "GET",
+        });
+
+        if (!Object.keys(github.data).includes("avatar_url")) {
+          return;
         }
         const response: ImageMessage = {
           type: "image",
-          originalContentUrl:
-            json.avatar_url,
-          previewImageUrl:
-            json.avatar_url,
+          originalContentUrl: github.data.avatar_url,
+          previewImageUrl: github.data.avatar_url,
         };
         await client.replyMessage({
           replyToken: replyToken,
@@ -77,15 +78,15 @@ const textEventHandler = async (
         });
         return;
       }
-      
+
       const resText = (() => {
         switch (Math.floor(Math.random() * 3)) {
           case 0:
-            return text.split("").reverse().join("")
+            return text.split("").reverse().join("");
           case 1:
-            return text.split("").join(" ")
+            return text.split("").join(" ");
           default:
-            return text.split("").reverse().join(" ")
+            return text.split("").reverse().join(" ");
         }
       })();
 
@@ -97,7 +98,8 @@ const textEventHandler = async (
         replyToken: replyToken,
         messages: [response],
       });
-      break;}
+      break;
+    }
     case "image": {
       const { id } = event.message;
 
@@ -110,7 +112,8 @@ const textEventHandler = async (
         replyToken: replyToken,
         messages: [response],
       });
-      break;}
+      break;
+    }
     default:
       break;
   }

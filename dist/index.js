@@ -17,7 +17,7 @@ const api_1 = require("@line/bot-sdk/dist/messaging-api/api");
 const express_1 = __importDefault(require("express"));
 const ts_dotenv_1 = require("ts-dotenv");
 const downloadContent_1 = require("./lib/downloadContent");
-const node_fetch_1 = __importDefault(require("node-fetch"));
+const axios_1 = __importDefault(require("axios"));
 const env = (0, ts_dotenv_1.load)({
     CHANNEL_ACCESS_TOKEN: String,
     CHANNEL_SECRET: String,
@@ -51,16 +51,18 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
             const { text } = event.message;
             // 「github」があるか確認
             if (text.toLowerCase().indexOf("github:") > -1) {
-                const username = text.split(':').pop();
-                const github = yield (0, node_fetch_1.default)(`https://api.github.com/users/${username}`);
-                const json = yield github.json();
-                if (!Object.keys(json).includes("avatar_url")) {
+                const username = text.split(":").pop();
+                const github = yield (0, axios_1.default)({
+                    url: `https://api.github.com/users/${username === null || username === void 0 ? void 0 : username.trim()}`,
+                    method: "GET",
+                });
+                if (!Object.keys(github.data).includes("avatar_url")) {
                     return;
                 }
                 const response = {
                     type: "image",
-                    originalContentUrl: json.avatar_url,
-                    previewImageUrl: json.avatar_url,
+                    originalContentUrl: github.data.avatar_url,
+                    previewImageUrl: github.data.avatar_url,
                 };
                 yield client.replyMessage({
                     replyToken: replyToken,
