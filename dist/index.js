@@ -17,6 +17,7 @@ const api_1 = require("@line/bot-sdk/dist/messaging-api/api");
 const express_1 = __importDefault(require("express"));
 const ts_dotenv_1 = require("ts-dotenv");
 const downloadContent_1 = require("./lib/downloadContent");
+const node_fetch_1 = __importDefault(require("node-fetch"));
 const env = (0, ts_dotenv_1.load)({
     CHANNEL_ACCESS_TOKEN: String,
     CHANNEL_SECRET: String,
@@ -48,18 +49,25 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
     switch (event.message.type) {
         case "text": {
             const { text } = event.message;
-            // if (text.toLowerCase().indexOf("illionillion") > 0) {
-            //   const response: ImageMessage = {
-            //     type: "image",
-            //     originalContentUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true",
-            //     previewImageUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true"
-            //   };
-            //   await client.replyMessage({
-            //     replyToken: replyToken,
-            //     messages: [response],
-            //   });
-            //   return
-            // }
+            // 「github」があるか確認
+            if (text.toLowerCase().indexOf("github:") > -1) {
+                const username = text.split(':').pop();
+                const github = yield (0, node_fetch_1.default)(`https://api.github.com/users/${username}`);
+                const json = yield github.json();
+                if (!Object.keys(json).includes("avatar_url")) {
+                    return;
+                }
+                const response = {
+                    type: "image",
+                    originalContentUrl: json.avatar_url,
+                    previewImageUrl: json.avatar_url,
+                };
+                yield client.replyMessage({
+                    replyToken: replyToken,
+                    messages: [response],
+                });
+                return;
+            }
             const resText = (() => {
                 switch (Math.floor(Math.random() * 3)) {
                     case 0:

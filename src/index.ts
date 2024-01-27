@@ -13,6 +13,7 @@ import {
 import express, { Application, Request, Response } from "express";
 import { load } from "ts-dotenv";
 import { downloadContent } from "./lib/downloadContent";
+import fetch from "node-fetch";
 
 const env = load({
   CHANNEL_ACCESS_TOKEN: String,
@@ -55,18 +56,27 @@ const textEventHandler = async (
     case "text": {
       const { text } = event.message;
 
-      // if (text.toLowerCase().indexOf("illionillion") > 0) {
-      //   const response: ImageMessage = {
-      //     type: "image",
-      //     originalContentUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true",
-      //     previewImageUrl: "https://github-simple-icon-generator.vercel.app/api/?username=illionillion?isCircle=true"
-      //   };
-      //   await client.replyMessage({
-      //     replyToken: replyToken,
-      //     messages: [response],
-      //   });
-      //   return
-      // }
+      // 「github」があるか確認
+      if (text.toLowerCase().indexOf("github:") > -1) {
+        const username = text.split(':').pop()
+        const github = await fetch(`https://api.github.com/users/${username}`);
+        const json: any = await github.json();
+        if (!Object.keys(json).includes("avatar_url")) {
+          return
+        }
+        const response: ImageMessage = {
+          type: "image",
+          originalContentUrl:
+            json.avatar_url,
+          previewImageUrl:
+            json.avatar_url,
+        };
+        await client.replyMessage({
+          replyToken: replyToken,
+          messages: [response],
+        });
+        return;
+      }
       
       const resText = (() => {
         switch (Math.floor(Math.random() * 3)) {
