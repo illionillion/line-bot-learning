@@ -65,6 +65,14 @@ const textEventHandler = async (
         });
 
         if (!Object.keys(github.data).includes("avatar_url")) {
+          const response: TextMessage = {
+            type: "text",
+            text: "画像の取得に失敗しました。",
+          };
+          await client.replyMessage({
+            replyToken: replyToken,
+            messages: [response],
+          });
           return;
         }
         const response: ImageMessage = {

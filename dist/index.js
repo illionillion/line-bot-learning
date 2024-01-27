@@ -57,6 +57,14 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
                     method: "GET",
                 });
                 if (!Object.keys(github.data).includes("avatar_url")) {
+                    const response = {
+                        type: "text",
+                        text: "画像の取得に失敗しました。",
+                    };
+                    yield client.replyMessage({
+                        replyToken: replyToken,
+                        messages: [response],
+                    });
                     return;
                 }
                 const response = {
