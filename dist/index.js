@@ -52,11 +52,27 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
             // 「github」があるか確認
             if (text.toLowerCase().indexOf("github:") > -1) {
                 const username = text.split(":").pop();
-                const github = yield (0, axios_1.default)({
-                    url: `https://api.github.com/users/${username === null || username === void 0 ? void 0 : username.trim()}`,
-                    method: "GET",
-                });
-                if (!Object.keys(github.data).includes("avatar_url")) {
+                try {
+                    const github = yield (0, axios_1.default)({
+                        url: `https://api.github.com/users/${username === null || username === void 0 ? void 0 : username.trim()}`,
+                        method: "GET",
+                    });
+                    if (!Object.keys(github.data).includes("avatar_url")) {
+                        return;
+                    }
+                    const response = {
+                        type: "image",
+                        originalContentUrl: github.data.avatar_url,
+                        previewImageUrl: github.data.avatar_url,
+                    };
+                    yield client.replyMessage({
+                        replyToken: replyToken,
+                        messages: [response],
+                    });
+                    return;
+                }
+                catch (error) {
+                    console.error("error: ", error);
                     const response = {
                         type: "text",
                         text: "画像の取得に失敗しました。",
@@ -67,16 +83,6 @@ const textEventHandler = (event) => __awaiter(void 0, void 0, void 0, function* 
                     });
                     return;
                 }
-                const response = {
-                    type: "image",
-                    originalContentUrl: github.data.avatar_url,
-                    previewImageUrl: github.data.avatar_url,
-                };
-                yield client.replyMessage({
-                    replyToken: replyToken,
-                    messages: [response],
-                });
-                return;
             }
             const resText = (() => {
                 switch (Math.floor(Math.random() * 3)) {

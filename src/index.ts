@@ -59,12 +59,27 @@ const textEventHandler = async (
       // 「github」があるか確認
       if (text.toLowerCase().indexOf("github:") > -1) {
         const username = text.split(":").pop();
-        const github = await axios({
-          url: `https://api.github.com/users/${username?.trim()}`,
-          method: "GET",
-        });
+        try {
+          const github = await axios({
+            url: `https://api.github.com/users/${username?.trim()}`,
+            method: "GET",
+          });
 
-        if (!Object.keys(github.data).includes("avatar_url")) {
+          if (!Object.keys(github.data).includes("avatar_url")) {
+            return;
+          }
+          const response: ImageMessage = {
+            type: "image",
+            originalContentUrl: github.data.avatar_url,
+            previewImageUrl: github.data.avatar_url,
+          };
+          await client.replyMessage({
+            replyToken: replyToken,
+            messages: [response],
+          });
+          return;
+        } catch (error) {
+          console.error("error: ", error);
           const response: TextMessage = {
             type: "text",
             text: "画像の取得に失敗しました。",
@@ -75,16 +90,6 @@ const textEventHandler = async (
           });
           return;
         }
-        const response: ImageMessage = {
-          type: "image",
-          originalContentUrl: github.data.avatar_url,
-          previewImageUrl: github.data.avatar_url,
-        };
-        await client.replyMessage({
-          replyToken: replyToken,
-          messages: [response],
-        });
-        return;
       }
 
       const resText = (() => {
